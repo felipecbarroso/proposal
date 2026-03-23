@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uma Pergunta Especial 💕</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600&display=swap');
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 40%, #0f3460 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Nunito', sans-serif;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Floating hearts background ── */
+    .hearts-bg {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .heart-particle {
+      position: absolute;
+      bottom: -60px;
+      font-size: 1.4rem;
+      animation: floatUp linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+      100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+    }
+
+    /* ── Card ── */
+    .card {
+      position: relative;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 2rem;
+      padding: 3rem 2.5rem 2.5rem;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,182,193,0.15);
+      animation: cardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: scale(0.85) translateY(30px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* ── Big heart ── */
+    .main-heart {
+      font-size: 5.5rem;
+      display: block;
+      animation: heartbeat 1.4s ease-in-out infinite;
+      filter: drop-shadow(0 0 18px rgba(255,100,130,0.7));
+      line-height: 1;
+      margin-bottom: 1.2rem;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      14%       { transform: scale(1.18); }
+      28%       { transform: scale(1); }
+      42%       { transform: scale(1.12); }
+      70%       { transform: scale(1); }
+    }
+
+    /* ── Typography ── */
+    h1 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.2rem;
+      color: #ffd6e0;
+      margin-bottom: 0.6rem;
+      text-shadow: 0 0 20px rgba(255,150,180,0.5);
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 2rem;
+      letter-spacing: 0.03em;
+    }
+
+    .message {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.45rem;
+      color: #ffe4ec;
+      line-height: 1.6;
+      margin-bottom: 2.2rem;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.3);
+    }
+
+    .question {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #ffb3c6;
+      margin-bottom: 2rem;
+      font-weight: 700;
+    }
+
+    /* ── Buttons ── */
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.75rem 2.2rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+
+    .btn-yes {
+      background: linear-gradient(135deg, #ff6b9d, #ff4081);
+      color: #fff;
+      box-shadow: 0 6px 24px rgba(255,64,129,0.45);
+    }
+
+    .btn-yes:hover {
+      transform: scale(1.07);
+      box-shadow: 0 8px 30px rgba(255,64,129,0.6);
+    }
+
+    .btn-no {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.2);
+      box-shadow: none;
+      position: fixed; /* will be moved by JS */
+    }
+
+    .btn-no:hover {
+      background: rgba(255,255,255,0.15);
+    }
+
+    /* ── Yes screen ── */
+    #yes-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      animation: cardIn 0.6s ease both;
+    }
+
+    #yes-screen .big-emoji {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      animation: spin 0.6s ease;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(-20deg) scale(0.5); }
+      to   { transform: rotate(0deg) scale(1); }
+    }
+
+    #yes-screen h2 {
+      font-family: 'Dancing Script', cursive;
+      font-size: 2.5rem;
+      color: #ffd6e0;
+      margin-bottom: 0.5rem;
+    }
+
+    #yes-screen p {
+      color: rgba(255,255,255,0.6);
+      font-size: 1rem;
+    }
+
+    .confetti-burst {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall 3s linear forwards;
+      opacity: 1;
+    }
+
+    @keyframes confettiFall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating hearts background -->
+  <div class="hearts-bg" id="heartsContainer"></div>
+
+  <!-- Main card -->
+  <div class="card" id="mainCard">
+
+    <!-- Proposal screen -->
+    <div id="proposal-screen">
+      <span class="main-heart">💗</span>
+      <h1>Tá bom, tá bom... 🙄</h1>
+      <p class="subtitle">Fazendo isso só porque você insistiu muito.</p>
+
+      <p class="question">Ce qué namorá? 😒</p>
+
+      <div class="btn-group">
+        <button class="btn btn-yes" id="btnYes" onclick="handleYes()">Claaaro! 😍</button>
+        <button class="btn btn-no"  id="btnNo"  onmouseenter="runAway()" ontouchstart="runAway()">Não</button>
+      </div>
+    </div>
+
+    <!-- Yes screen -->
+    <div id="yes-screen">
+      <div class="big-emoji">😤</div>
+      <h2>Tá, combinado então.</h2>
+      <p>Feliz? Espero que sim. Porque eu tô. 😊💕</p>
+    </div>
+
+  </div>
+
+  <!-- Confetti container (created on yes) -->
+  <div class="confetti-burst" id="confetti"></div>
+
+  <script>
+    /* ── Floating hearts ── */
+    const heartsContainer = document.getElementById('heartsContainer');
+    const emojis = ['💕','💗','💖','💝','💓','✨','🌸','💞'];
+
+    function spawnHeart() {
+      const el = document.createElement('span');
+      el.className = 'heart-particle';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left = Math.random() * 100 + 'vw';
+      el.style.fontSize = (Math.random() * 1.2 + 0.8) + 'rem';
+      const dur = Math.random() * 8 + 7;
+      el.style.animationDuration = dur + 's';
+      el.style.animationDelay = Math.random() * 4 + 's';
+      heartsContainer.appendChild(el);
+      setTimeout(() => el.remove(), (dur + 4) * 1000);
+    }
+
+    setInterval(spawnHeart, 600);
+    for (let i = 0; i < 10; i++) spawnHeart();
+
+    /* ── "No" button runs away ── */
+    let noMoveCount = 0;
+    function runAway() {
+      noMoveCount++;
+      const btn = document.getElementById('btnNo');
+      const margin = 20;
+      const maxX = window.innerWidth  - btn.offsetWidth  - margin;
+      const maxY = window.innerHeight - btn.offsetHeight - margin;
+      btn.style.left = (Math.random() * maxX + margin) + 'px';
+      btn.style.top  = (Math.random() * maxY + margin) + 'px';
+
+      // Shrink "No" the more they try
+      if (noMoveCount > 3) {
+        const size = Math.max(0.5, 1 - (noMoveCount - 3) * 0.07);
+        btn.style.transform = `scale(${size})`;
+        btn.style.opacity = size;
+      }
+    }
+
+    /* ── Yes ── */
+    function handleYes() {
+      document.getElementById('proposal-screen').style.display = 'none';
+      const ys = document.getElementById('yes-screen');
+      ys.style.display = 'flex';
+      launchConfetti();
+    }
+
+    /* ── Confetti burst ── */
+    function launchConfetti() {
+      const container = document.getElementById('confetti');
+      const colors = ['#ff6b9d','#ffb3c6','#ffd6e0','#ff4081','#fff','#ffe082','#b2ebf2'];
+      for (let i = 0; i < 120; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = (Math.random() * 100) + 'vw';
+        piece.style.top  = '-20px';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.width  = (Math.random() * 8 + 6) + 'px';
+        piece.style.height = (Math.random() * 8 + 6) + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        piece.style.animationDelay    = (Math.random() * 1.5) + 's';
+        piece.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        container.appendChild(piece);
+      }
+      setTimeout(() => container.innerHTML = '', 5000);
+    }
+
+    /* Position "No" button initially within viewport */
+    window.addEventListener('load', () => {
+      const btn = document.getElementById('btnNo');
+      // Place it relative to card first, then switch to fixed
+      const r = btn.getBoundingClientRect();
+      btn.style.left = r.left + 'px';
+      btn.style.top  = r.top  + 'px';
+    });
+  </script>
+</body>
+</html>
